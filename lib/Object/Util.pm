@@ -48,7 +48,7 @@ sub _new :method
 	if ($ref)
 	{
 		croak "Invocant is not a coderef"
-			unless _is_reftype($ref, 'CODE');
+			unless _is_reftype($class, 'CODE');
 	}
 	else
 	{
