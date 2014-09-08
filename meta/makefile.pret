@@ -10,6 +10,7 @@
 	:test-requirement       [ :on "Test::Without::Module"^^:CpanId ];
 	:test-recommendation    [ :on "Moose 2.0000"^^:CpanId ];
 	:test-recommendation    [ :on "Moo 1.000000"^^:CpanId ];
+	:test-suggestion        [ :on "Mouse 1.00"^^:CpanId ];
 	:runtime-requirement    [ :on "List::Util 1.29"^^:CpanId ];
 	:runtime-requirement    [ :on "Scalar::Util 1.23"^^:CpanId ];
 	:runtime-requirement    [ :on "Module::Runtime"^^:CpanId ];
