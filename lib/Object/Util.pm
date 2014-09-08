@@ -133,10 +133,18 @@ sub _clone :method
 		if $object->can("clone");
 	
 	my $tool = ($toolage{$class} ||= _detect_metaclass($class));
+	
 	if ($tool eq "Moose")
 	{
 		require Moose::Util;
 		my $meta = Moose::Util::find_meta($class);
+		return $meta->clone_object($object, @_);
+	}
+	
+	if ($tool eq "Mouse")
+	{
+		require Mouse::Util;
+		my $meta = Mouse::Util::find_meta($class);
 		return $meta->clone_object($object, @_);
 	}
 	
@@ -146,6 +154,7 @@ sub _clone :method
 	ref($object)->Object::Util::_new({ %$object, @_ });
 }
 
+my $mouse_trait = 0;
 sub _with_traits :method
 {
 	my $class = shift;
@@ -166,7 +175,18 @@ sub _with_traits :method
 	
 	if ($tool eq 'Mouse')
 	{
-		croak "\$_with_traits does not currently support Mouse-based objects";
+		require Mouse::Util;
+		require MooX::Traits::Util;
+		
+		my @traits = MooX::Traits::Util::resolve_traits($class, @_);
+		
+		my $meta = ref(Mouse::Util::find_meta($class))->create(
+			sprintf('%s::__ANON__::%s', __PACKAGE__, ++$mouse_trait),
+			superclasses => [ $class ],
+			roles        => \@traits,
+			cache        => 1,
+		);
+		return $meta->name;
 	}
 	
 	require Role::Tiny;
@@ -373,7 +393,8 @@ Same as L<Object::Tap>, or the C<tap> method in Ruby.
 =item C<< $_clone >>
 
 If the object provides a C<clone> method, calls that. Or if the object
-appears to be Moose-based, clones it using the metaobject protocol.
+appears to be Moose- or Mouse-based, clones it using the metaobject
+protocol.
 
 Otherwise takes the naive approach of treating the object as a hashref
 or attribute values, and creates a new object of the same class.
