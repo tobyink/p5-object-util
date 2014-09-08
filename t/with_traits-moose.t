@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Tests for C<< $_with_traits >>.
+Tests for C<< $_with_traits >> using Moose objects.
 
 =head1 AUTHOR
 
@@ -22,12 +22,15 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
+use Test::Requires { Moose => '2.0000' };
 
 use Object::Util;
 
-ok(
-	"Module::Runtime"->$_with_traits("MooX::Traits")->can("with_traits"),
-	"yay",
-);
+{ package Foo; use Moose::Role; }
+{ package Bar; use Moose; with "Foo"; }
+
+my $obj = Bar->$_with_traits("Foo")->new;
+
+ok( $obj->does("Foo") );
 
 done_testing;
