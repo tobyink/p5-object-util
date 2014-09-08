@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test that Object::Util compiles.
+Tests for C<< $_dump >>.
 
 =head1 AUTHOR
 
@@ -24,12 +24,12 @@ use warnings;
 use Test::More;
 
 use Object::Util;
-require Module::Runtime;
 
-ok(
-	"Module::Runtime"->$_with_traits("MooX::Traits")->can("with_traits"),
-	"yay",
-);
+my $test = bless({ foo => [1..3], bar => 666, baz => 999 }, 'TestClass');
+my $dump = $test->$_dump();
+
+like($dump, qr/foo\s*=>/, 'dump formatted nicely');
+is_deeply( eval($dump), $test, 'dump seems OK' );
 
 done_testing;
 
