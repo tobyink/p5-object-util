@@ -22,6 +22,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
+use Test::Fatal;
 use Test::Requires { Moo   => '1.000000' };
 use Test::Requires { curry => '0' };
 
@@ -66,6 +67,12 @@ is(
 	$factory2->$_new(30)->foo,
 	42,
 	'$object->$_new',
+);
+
+like(
+	exception { my $x = []; $x->$_new },
+	qr/^Invocant is not a coderef/,
+	'$ref->$_new (exception)',
 );
 
 done_testing;
