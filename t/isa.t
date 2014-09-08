@@ -22,6 +22,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
+use Test::Warnings;
 
 { package Foo; sub new { bless({}, $_[0]) } }
 { package Bar; our @ISA = qw(Foo); sub bar { 1 } }

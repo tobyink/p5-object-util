@@ -22,6 +22,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
+use Test::Warnings;
 
 use Object::Util;
 
