@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test that Object::Util compiles.
+Test that Object::Util still works without B::Hooks::Parser.
 
 =head1 AUTHOR
 
@@ -22,6 +22,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
+use Test::Without::Module qw( B::Hooks::Parser );
 
 use Object::Util;
 

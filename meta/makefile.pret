@@ -7,6 +7,7 @@
 	:test-requirement       [ :on "Test::Requires"^^:CpanId ];
 	:test-requirement       [ :on "Test::Fatal"^^:CpanId ];
 	:test-requirement       [ :on "Test::Warnings"^^:CpanId ];
+	:test-requirement       [ :on "Test::Without::Module"^^:CpanId ];
 	:runtime-requirement    [ :on "List::Util 1.29"^^:CpanId ];
 	:runtime-requirement    [ :on "Scalar::Util 1.23"^^:CpanId ];
 	:runtime-requirement    [ :on "Module::Runtime"^^:CpanId ];
