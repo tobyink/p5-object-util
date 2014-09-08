@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test that Object::Util compiles.
+Tests for C<< $_with_traits >>.
 
 =head1 AUTHOR
 
@@ -23,7 +23,14 @@ use strict;
 use warnings;
 use Test::More;
 
-require_ok 'Object::Util';
+use Object::Util;
+
+ok(
+	"Module::Runtime"->$_with_traits("MooX::Traits")->can("with_traits"),
+	"yay",
+);
+
+diag('not tested: Moose classes');
+diag('not tested: Mouse classes');
 
 done_testing;
-
