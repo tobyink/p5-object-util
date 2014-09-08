@@ -32,7 +32,7 @@ use Scalar::Util     1.23        qw( blessed reftype );
 		my $object = shift;
 		my $type   = $_[0];
 		
-		return !!1 if reftype($object) eq $type;
+		return !!1 if (reftype($object)||'') eq $type;
 		return !!0 if not $INC{'overload.pm'};
 		
 		my $op = $op{$type} or return !!0;
@@ -143,7 +143,7 @@ sub _clone :method
 	croak "Object does not provide a 'clone' method, and is not a hashref"
 		unless _is_reftype($object, 'HASH');
 	
-	$object->Object::Util::_new({ %$object, @_ });
+	ref($object)->Object::Util::_new({ %$object, @_ });
 }
 
 sub _with_traits :method
