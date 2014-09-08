@@ -381,6 +381,9 @@ or attribute values, and creates a new object of the same class.
    # clone overrides some attributes from the original object
    my $glenda = $glen->$_clone(name => "Glenda", gender => "f");
 
+That final fallback obviously massively breaks your class'
+encapsulation, so it should be used sparingly.
+
 =item C<< $_with_traits >>
 
 Calling C<< $class->$_with_traits(@traits) >> will return a new class
