@@ -53,4 +53,8 @@ is(
 	'clone is shallow',
 );
 
+diag('not tested: Moose objects');
+diag('not tested: objects that provide their own clone method');
+diag('not tested: exceptions');
+
 done_testing;
