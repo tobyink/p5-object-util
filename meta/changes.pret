@@ -4,3 +4,9 @@
 	issued  2014-09-09;
 	label   "Initial release".
 
+`Object-Util 0.002 cpan:TOBYINK`
+	issued  2014-09-09;
+	changeset [
+		item "Fix Mouse-related failures."^^Tests;
+		item "Add $_extends method."^^Addition;
+	].
