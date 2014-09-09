@@ -7,7 +7,7 @@ BEGIN { if ($] < 5.010000) { require UNIVERSAL::DOES } };
 package Object::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use B                            qw( perlstring );
 use Carp                         qw( croak );
