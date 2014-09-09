@@ -17,6 +17,8 @@ use MooX::Traits::Util;
 use Role::Tiny;
 use Scalar::Util     1.23        qw( blessed reftype );
 
+my $anon_class_id = 0;
+
 {
 	my %op = (
 		HASH    => '%{}',
@@ -154,13 +156,14 @@ sub _clone :method
 	ref($object)->Object::Util::_new({ %$object, @_ });
 }
 
-my $mouse_trait = 0;
 sub _with_traits :method
 {
 	my $class = shift;
 	
 	croak "Cannot call \$_with_roles on reference"
 		if ref $class;
+	
+	return $class unless @_;
 	
 	my $tool = ($toolage{$class} ||= _detect_metaclass($class));
 	
@@ -181,7 +184,7 @@ sub _with_traits :method
 		my @traits = MooX::Traits::Util::resolve_traits($class, @_);
 		
 		my $meta = ref(Mouse::Util::find_meta($class))->create(
-			sprintf('%s::__ANON__::%s', __PACKAGE__, ++$mouse_trait),
+			sprintf('%s::__ANON__::%s', __PACKAGE__, ++$anon_class_id),
 			superclasses => [ $class ],
 			roles        => \@traits,
 			cache        => 1,
@@ -206,6 +209,57 @@ sub _dump :method
 	Data::Dumper::Dumper($_[0]);
 }
 
+{
+	my %_cache;
+	sub _eigenclass
+	{
+		my $class = shift;
+		my ($roles, $methods) = @_;
+		
+		my @traits;
+		if ($roles and @$roles)
+		{
+			require MooX::Traits::Util;
+			@traits = MooX::Traits::Util::resolve_traits($class, @$roles);
+		}
+		
+		my $key = do
+		{
+			no warnings qw(once);
+			require Storable;
+			local $Storable::Deparse   = 1;
+			local $Storable::canonical = 1;
+			Storable::freeze( [$class, \@traits, $methods] );
+		};
+		
+		my $eigenclass = $_cache{$key};
+		unless ($eigenclass)
+		{
+			no strict qw(refs);
+			$_cache{$key}
+				= $eigenclass
+				= sprintf('%s::__ANON__::%s', __PACKAGE__, ++$anon_class_id);
+			*{"$eigenclass\::ISA"} = [ _with_traits($class, @traits) ];
+			*{"$eigenclass\::$_"}  = $methods->{$_} for keys %$methods;
+		}
+		
+		$eigenclass;
+	}
+}
+
+sub _extend :method
+{
+	my $object = shift;
+	my $class  = blessed($object)
+		or croak("Cannot call \$_extend on non-object");
+	
+	my $roles   = _is_reftype($_[0], "ARRAY") ? shift : [];
+	my $methods = _is_reftype($_[0], "HASH")  ? shift : {@_};
+	
+	return $object unless @$roles || keys(%$methods);
+	bless $object, _eigenclass($class, $roles, $methods);
+}
+
 sub subs :method
 {
 	'$_new'             => \&_new,
@@ -219,6 +273,7 @@ sub subs :method
 	'$_clone'           => \&_clone,
 	'$_with_traits'     => \&_with_traits,
 	'$_dump'            => \&_dump,
+	'$_extend'          => \&_extend,
 }
 
 sub sub_names :method
@@ -411,6 +466,13 @@ Calling C<< $class->$_with_traits(@traits) >> will return a new class
 name that does some extra traits. Should roughly support L<Moose>,
 L<Moo>, and C<Role::Tiny>.
 
+=item C<< $_extend >>
+
+Calling C<< $object->$_extend(\@traits, \%methods) >> will add some
+extra roles and/or methods to an existing object.
+
+Like L<Object::Extend>, but with added support for roles.
+
 =item C<< $_dump >>
 
 Calling C<< $object->$_dump >> returns a L<Data::Dumper> dump of the
@@ -442,7 +504,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Object-Util>.
 =head1 SEE ALSO
 
 L<Safe::Isa>, L<UNIVERSAL>, L<Object::Tap>, L<MooseX::Clone>,
-L<Data::Dumper::Concise>.
+L<Data::Dumper::Concise>, L<Object::Extend>.
 
 =head1 AUTHOR
 
