@@ -7,7 +7,7 @@ BEGIN { if ($] < 5.010000) { require UNIVERSAL::DOES } };
 package Object::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.001';
 
 use B                            qw( perlstring );
 use Carp                         qw( croak );
@@ -103,6 +103,11 @@ sub _detect_metaclass
 {
 	my $class = shift;
 	
+	if ($INC{"Moo.pm"})
+	{
+		return "Moo" if $Moo::MAKERS{$class}{is_class};
+	}
+	
 	if ($INC{'Moose.pm'})
 	{
 		require Moose::Util;
@@ -115,12 +120,14 @@ sub _detect_metaclass
 		return "Mouse" if Mouse::Util::find_meta($class);
 	}
 	
-	if ($INC{"Moo.pm"})
-	{
-		return "Moo" if $Moo::MAKERS{$class}{is_class};
-	}
+	my $meta;
+	eval { $meta = $class->meta } or return "Other";
 	
-	"Other";
+	return "Moo"   if ref($meta) eq "Moo::HandleMoose::FakeMetaClass";
+	return "Mouse" if $meta->isa("Mouse::Meta::Module");
+	return "Moose" if $meta->isa("Moose::Meta::Class");
+	return "Moose" if $meta->isa("Moose::Meta::Role");
+	return "Other";
 }
 
 sub _clone :method
@@ -239,8 +246,35 @@ sub _dump :method
 			$_cache{$key}
 				= $eigenclass
 				= sprintf('%s::__ANON__::%s', __PACKAGE__, ++$anon_class_id);
-			*{"$eigenclass\::ISA"} = [ _with_traits($class, @traits) ];
-			*{"$eigenclass\::$_"}  = $methods->{$_} for keys %$methods;
+			
+			my $tool = ($toolage{$class} ||= _detect_metaclass($class));
+			if ($tool eq "Moose")
+			{
+				require Moose::Meta::Class;
+				'Moose::Meta::Class'->create(
+					$eigenclass => (
+						superclasses => [$class],
+						(roles       => \@traits) x!!@traits,
+						methods      => $methods,
+					),
+				);
+			}
+			elsif ($tool eq "Mouse")
+			{
+				require Mouse::Meta::Class;
+				'Mouse::Meta::Class'->create(
+					$eigenclass => (
+						superclasses => [$class],
+						(roles       => \@traits) x!!@traits,
+						methods      => $methods,
+					),
+				);
+			}
+			else
+			{
+				*{"$eigenclass\::ISA"} = [ _with_traits($class, @traits) ];
+				*{"$eigenclass\::$_"}  = $methods->{$_} for keys %$methods;
+			}
 		}
 		
 		$eigenclass;
