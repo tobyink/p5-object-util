@@ -143,32 +143,48 @@ sub _clone :method
 	
 	my $tool = ($toolage{$class} ||= _detect_metaclass($class));
 	
+	my %args = (@_ == 1 and ref($_[0]) eq "HASH") ? %{$_[0]} : @_;
+	
 	if ($tool eq "Moose")
 	{
 		require Moose::Util;
 		my $meta = Moose::Util::find_meta($class);
-		return $meta->clone_object($object, @_);
+		return $meta->clone_object($object, %args);
 	}
 	
 	if ($tool eq "Mouse")
 	{
 		require Mouse::Util;
 		my $meta = Mouse::Util::find_meta($class);
-		return $meta->clone_object($object, @_);
+		return $meta->clone_object($object, %args);
 	}
 	
 	croak "Object does not provide a 'clone' method, and is not a hashref"
 		unless _is_reftype($object, 'HASH');
 	
-	ref($object)->Object::Util::_new({ %$object, @_ });
+	ref($object)->Object::Util::_new({ %$object, %args });
 }
 
 sub _with_traits :method
 {
 	my $class = shift;
 	
-	croak "Cannot call \$_with_roles on reference"
-		if ref $class;
+	if (ref $class)
+	{
+		croak "Cannot call \$_with_roles on reference"
+			unless _is_reftype($class, 'CODE');
+		
+		if (@_)
+		{
+			my $factory    = $class;
+			my @trait_list = @_;
+			
+			return sub {
+				my $instance = $factory->(@_);
+				_extend($instance, [@trait_list]);
+			};
+		}
+	}
 	
 	return $class unless @_;
 	
@@ -499,6 +515,27 @@ encapsulation, so it should be used sparingly.
 Calling C<< $class->$_with_traits(@traits) >> will return a new class
 name that does some extra traits. Should roughly support L<Moose>,
 L<Moo>, and C<Role::Tiny>.
+
+If C<< $class >> is actually a (factory) coderef, then this will only
+I<partly> work. Example:
+
+   my $factory  = sub { Foo->new(@_) };
+   my $instance = $factory->$_with_traits("Bar")->$_new(%args);
+
+The object C<< $instance >> should now be a C<Foo> object, and should
+do the C<Bar> role, however if C<Bar> defines any I<attributes>, then
+C<< $_new >> will not have initialized them correctly. This is because
+of the opacity of the C<< $factory >>: C<< $_with_traits >> cannot
+peek inside it and apply traits to the C<Foo> class; instead it needs
+to build C<< $instance >> and apply the traits to the already-built
+object. Therefore any behaviour that C<Bar> defines for the constructor
+will have been ignored.
+
+It is sometimes possible to work around this issue using:
+
+   my $factory  = sub { Foo->new(@_) };
+   my $instance = $factory->$_with_traits("Bar")->$_new(%args);
+   $instance = $instance->$_clone(%args);
 
 =item C<< $_extend >>
 
