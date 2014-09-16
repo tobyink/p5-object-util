@@ -25,3 +25,12 @@
 		item "Document that most places $method is used in the documentation accept either a method name or a coderef."^^Documentation;
 		item "Fix referenes to $object->$_does($class) (and $_DOES too) where $class should have been $role."^^Documentation;
 	].
+
+`Object-Util 0.005 cpan:TOBYINK`
+	issued  2014-09-16;
+	changeset [
+		item "Clean up some old `use` statements that were no longer needed."^^Change;
+		item "Delay loading Module::Runtime until it's actually needed."^^Change;
+		item "Make it possible to avoid the B::Hooks::Parser/Internals::SvREADONLY magic."^^Change;
+		item "Restructure and further clarify documentation of methods."^^Documentation;
+	].
