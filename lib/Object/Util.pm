@@ -448,12 +448,15 @@ not package variables (a.k.a. C<our> variables).
 
 =item C<< $_new >>
 
-Can be used as C<< $factory->$_new(@args) >> to create a new object.
+Can be used like C<< $class->$_new(@args) to create a new object.
+Object::Util will use L<Module::Runtime> to I<attempt> to load
+C<< $class >> if it is not already loaded. C<< $class >> is expected
+to provide a method called C<new>.
 
-C<< $factory >> may be a class name (the module will be auto-loaded),
-or may be a coderef or object overloading C<< &{} >>. If it's a class
-name, then C<< $class->new(@args) >> will be called; otherwise
-C<< $coderef->(@args) >> will be called.
+Can also be used as C<< $factory->$_new(@args) >> to create a new
+object, where C<< $factory >> is a coderef or an object overloading
+C<< &{} >>. In this case, C<< $_new >> will simply call
+C<< $factory->(@args) >> and expect that to return an object.
 
 =item C<< $_isa >>
 
