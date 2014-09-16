@@ -32,5 +32,9 @@ my $dump = $test->$_dump();
 like($dump, qr/foo\s*=>/, 'dump formatted nicely');
 is_deeply( eval($dump), $test, 'dump seems OK' );
 
+sub OtherTestClass::dump { sprintf('[%d,%d]', @{$_[0]}{qw/ x y /}) }
+my $test2 = bless({x => 1, y => 2}, 'OtherTestClass');
+is( $test2->$_dump, '[1,2]', 'dump can be overridden' );
+
 done_testing;
 

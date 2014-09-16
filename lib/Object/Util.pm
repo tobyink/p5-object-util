@@ -229,6 +229,11 @@ sub _dump :method
 	local $Data::Dumper::Deparse = 1;
 	local $Data::Dumper::Quotekeys = 0;
 	local $Data::Dumper::Sortkeys = 1;
+	
+	if ( _can($_[0], "dump") ) {
+		return shift->dump(@_);
+	}
+	
 	Data::Dumper::Dumper($_[0]);
 }
 
@@ -549,6 +554,9 @@ Like L<Object::Extend>, but with added support for roles.
 Calling C<< $object->$_dump >> returns a L<Data::Dumper> dump of the
 object, with some useful changes to the default Data::Dumper output.
 (Same as L<Data::Dumper::Concise>.)
+
+If the object provides its own C<dump> method, this will be called
+instead.
 
 =back
 
