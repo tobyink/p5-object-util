@@ -9,7 +9,7 @@ package Object::Util;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.004';
 
-use Carp                         qw( croak );
+use Carp                         qw( carp croak );
 use List::Util       1.29        qw( pairkeys pairvalues );
 use Scalar::Util     1.23        qw( blessed reftype );
 
@@ -365,14 +365,24 @@ sub setup_for :method
 sub import :method
 {
 	my $me = shift;
+	my (%args) = @_;
 	my ($caller, $file) = caller;
 	
-	if ($file ne '-e' and eval { require B::Hooks::Parser })
+	$args{magic} = "auto" unless defined $args{magic};
+	
+	if ($file ne '-e'
+	and $args{magic}
+	and eval { require B::Hooks::Parser })
 	{
 		my $varlist = join ',', $me->sub_names;
 		my $reflist = join ',', map "\\$_", $me->sub_names;
 		B::Hooks::Parser::inject(";my($varlist);$me\->setup_for($reflist);");
 		return;
+	}
+	
+	if ($args{magic} and $args{magic} ne "auto")
+	{
+		carp "Object::Util could not use magic; continuing regardless";
 	}
 	
 	my %subs = $me->subs;
@@ -625,6 +635,11 @@ If this module detects that B::Hooks::Parser cannot be used on your
 version of Perl, or your Perl is too old to have Internals::SvREADONLY,
 then it has various fallback routes, but the variables it provides may
 end up as package (C<our>) variables, or not be read-only.
+
+If the magic works on your version of Perl, but you wish to avoid the
+magic anyway, you can switch it off:
+
+   use Object::Util magic => 0;
 
 =head1 BUGS
 
