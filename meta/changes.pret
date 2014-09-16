@@ -17,3 +17,11 @@
 		item "If an object provides its own dump method, then $_dump should defer to that."^^Change;
 		item "Allow $_with_traits to (mostly) work with factory coderefs."^^Change;
 	].
+
+`Object-Util 0.004 cpan:TOBYINK`
+	issued  2014-09-16;
+	changeset [
+		item "Support $object->$_can($method) where $method is a coderef."^^Change;
+		item "Document that most places $method is used in the documentation accept either a method name or a coderef."^^Documentation;
+		item "Fix referenes to $object->$_does($class) (and $_DOES too) where $class should have been $role."^^Documentation;
+	].
