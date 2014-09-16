@@ -10,3 +10,10 @@
 		item "Fix Mouse-related failures."^^Tests;
 		item "Add $_extends method."^^Addition;
 	].
+
+`Object-Util 0.003 cpan:TOBYINK`
+	issued  2014-09-16;
+	changeset [
+		item "If an object provides its own dump method, then $_dump should defer to that."^^Change;
+		item "Allow $_with_traits to (mostly) work with factory coderefs."^^Change;
+	].
