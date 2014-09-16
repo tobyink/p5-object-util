@@ -484,19 +484,25 @@ C<< $object->$_call_if_object($method => @args) >> works like
 C<< $object->$method(@args) >>, but returns C<undef> if C<< $object >>
 is undefined.
 
+C<< $method >> may be a method name, or a coderef (anonymous method).
+
 Same as L<Safe::Isa>.
 
 =item C<< $_try >>
 
 C<< $object->$_try($method => @args) >> works like
-C<< $object->$method(@args) >>, but returns C<undef> if any exception
-is thrown.
+C<< $object->$method(@args) >>, but returns C<undef> if I<any>
+exception is thrown.
+
+C<< $method >> may be a method name, or a coderef (anonymous method).
 
 =item C<< $_tap >>
 
 C<< $object->$_tap($method => @args) >> works like
 C<< $object->$method(@args) >>, but returns the object itself, making
 it useful for chaining.
+
+C<< $method >> may be a method name, or a coderef (anonymous method).
 
 Same as L<Object::Tap>, or the C<tap> method in Ruby.
 
