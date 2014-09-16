@@ -41,4 +41,6 @@ ok(!$foo->$_can('bar'), 'foo !$_can bar');
 ok($bar->$_can('bar'), 'bar $_can bar');
 ok(eval { $blam->$_can('bar'); 1 }, 'no boom today');
 
+ok($bar->$_can(sub { 42 }), '$object->$_can($coderef)');
+
 done_testing;

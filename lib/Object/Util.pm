@@ -70,7 +70,7 @@ sub _call_if_object :method
 	$object->$method(@_);
 }
 
-for my $method (qw/ isa can does DOES /)
+for my $method (qw/ isa does DOES /)
 {
 	eval qq{
 		sub _${method} :method
@@ -80,6 +80,14 @@ for my $method (qw/ isa can does DOES /)
 		}
 		1;
 	} or die "Internal problem: $@";
+}
+
+sub _can :method
+{
+	my $self = shift;
+	return unless Scalar::Util::blessed($self);
+	return $_[0] if ref($_[0]) eq 'CODE';
+	$self->can(@_);
 }
 
 sub _try :method
@@ -459,21 +467,24 @@ Same as L<Safe::Isa>.
 
 =item C<< $_can >>
 
-C<< $object->$_can($class) >> works like C<can> as defined in
+C<< $object->$_can($method) >> works like C<can> as defined in
 L<UNIVERSAL>, but returns C<undef> if C<< $object >> is undefined.
 
-Same as L<Safe::Isa>.
+Similar to L<Safe::Isa>, but also returns true if C<$method> is an
+unblessed coderef. (The behaviour of C<$method> if it is a blessed
+object -- particularly in the face of overloading -- can be
+unintuitive, so is not supported by C<< $_can >>.)
 
 =item C<< $_does >>
 
-C<< $object->$_does($class) >> works like C<does> as defined in
+C<< $object->$_does($role) >> works like C<does> as defined in
 L<Moose::Object>, but returns C<undef> if C<< $object >> is undefined.
 
 Same as L<Safe::Isa>.
 
 =item C<< $_DOES >>
 
-C<< $object->$_DOES($class) >> works like C<DOES> as defined in
+C<< $object->$_DOES($role) >> works like C<DOES> as defined in
 L<UNIVERSAL>, but returns C<undef> if C<< $object >> is undefined.
 
 Same as L<Safe::Isa>.
