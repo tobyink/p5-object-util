@@ -9,12 +9,8 @@ package Object::Util;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.004';
 
-use B                            qw( perlstring );
 use Carp                         qw( croak );
 use List::Util       1.29        qw( pairkeys pairvalues );
-use Module::Runtime              qw( use_module use_package_optimistically );
-use MooX::Traits::Util;
-use Role::Tiny;
 use Scalar::Util     1.23        qw( blessed reftype );
 
 my $anon_class_id = 0;
@@ -54,7 +50,8 @@ sub _new :method
 	}
 	else
 	{
-		use_package_optimistically($class);
+		require Module::Runtime;
+		Module::Runtime::use_package_optimistically($class);
 		croak "Class $class does not provide a constructor called 'new'"
 			unless $class->can("new");
 	}
