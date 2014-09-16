@@ -34,3 +34,9 @@
 		item "Make it possible to avoid the B::Hooks::Parser/Internals::SvREADONLY magic."^^Change;
 		item "Restructure and further clarify documentation of methods."^^Documentation;
 	].
+
+`Object-Util 0.006 cpan:TOBYINK`
+	issued  2014-09-16;
+	changeset [
+		item "Clarify and correct documentation for $_extend."^^Documentation;
+	].
