@@ -45,5 +45,5 @@
 	label   "Bond, James Bond";
 	issued  2017-06-01;
 	changeset [
-		item "Add $_dwarn and $_dwarn_call."^^Documentation;
+		item "Add $_dwarn and $_dwarn_call."^^Addition;
 	].
