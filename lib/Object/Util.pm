@@ -242,6 +242,59 @@ sub _dump :method
 	Data::Dumper::Dumper($_[0]);
 }
 
+sub _dwarn :method
+{
+	require Data::Dumper;
+	local $Data::Dumper::Terse = 1;
+	local $Data::Dumper::Indent = 1;
+	local $Data::Dumper::Useqq = 1;
+	local $Data::Dumper::Deparse = 1;
+	local $Data::Dumper::Quotekeys = 0;
+	local $Data::Dumper::Sortkeys = 1;
+	
+	warn Data::Dumper::Dumper(@_);
+	
+	wantarray ? @_ : $_[0];
+}
+
+sub _dwarn_call :method
+{
+	require Data::Dumper;
+	local $Data::Dumper::Terse = 1;
+	local $Data::Dumper::Indent = 1;
+	local $Data::Dumper::Useqq = 1;
+	local $Data::Dumper::Deparse = 1;
+	local $Data::Dumper::Quotekeys = 0;
+	local $Data::Dumper::Sortkeys = 1;
+	
+	my $object = shift;
+	my $method = shift;
+	my @args   = @_;
+	
+	warn "== INVOCANT ==\n";
+	warn Data::Dumper::Dumper($object);
+
+	warn "== METHOD ==\n";
+	warn Data::Dumper::Dumper($method);
+
+	if (@args) {
+		warn "== ARGUMENTS ==\n";
+		warn Data::Dumper::Dumper(@args);
+	}
+	
+	my @r;
+	if    (wantarray)         { @r = $object->$method(@args) }
+	elsif (defined wantarray) { @r = scalar $object->$method(@args) }
+	else                      { $object->$method(@args); undef; }
+	
+	if (defined wantarray) {
+		warn "== RETURN ==\n";
+		warn Data::Dumper::Dumper(@r);
+	}
+	
+	wantarray ? @r : $r[0];
+}
+
 {
 	my %_cache;
 	sub _eigenclass
@@ -333,6 +386,8 @@ sub subs :method
 	'$_clone'           => \&_clone,
 	'$_with_traits'     => \&_with_traits,
 	'$_dump'            => \&_dump,
+	'$_dwarn'           => \&_dwarn,
+	'$_dwarn_call'      => \&_dwarn_call,
 	'$_extend'          => \&_extend,
 }
 
