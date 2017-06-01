@@ -40,3 +40,10 @@
 	changeset [
 		item "Clarify and correct documentation for $_extend."^^Documentation;
 	].
+
+`Object-Util 0.007 cpan:TOBYINK`
+	label   "Bond, James Bond";
+	issued  2017-06-01;
+	changeset [
+		item "Add $_dwarn and $_dwarn_call."^^Documentation;
+	].
