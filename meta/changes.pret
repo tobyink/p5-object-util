@@ -47,3 +47,9 @@
 	changeset [
 		item "Add $_dwarn and $_dwarn_call."^^Addition;
 	].
+
+`Object-Util 0.008 cpan:TOBYINK`
+	issued  2018-05-29;
+	changeset [
+		item "Fix typo which referred to $_call_if_object as $_call_if_method."^^Documentation;
+	].
