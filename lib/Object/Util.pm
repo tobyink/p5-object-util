@@ -720,6 +720,10 @@ magic anyway, you can switch it off:
 
    use Object::Util magic => 0;
 
+The magic may trigger bugs if you're loading Object::Util in a sufficiently
+unusual way (for example, C<require> and C<import> instead of C<use>). If
+this happens, disable magic.
+
 =head1 BUGS
 
 Please report any bugs to
@@ -736,7 +740,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2014 by Toby Inkster.
+This software is copyright (c) 2014, 2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
