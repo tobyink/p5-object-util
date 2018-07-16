@@ -376,6 +376,47 @@ sub _extend :method
 	bless $object, _eigenclass($class, $roles, $methods);
 }
 
+sub _murder :method
+{
+	blessed($_[0]) or croak ("Cannot kill non-object");
+	
+	unless (exists &__REAPED__::AUTOLOAD) {
+		eval qq{
+			package __REAPED__;
+			sub $_ {
+				Object::Util::croak("Can't call method \\"$_\\" on reaped object");
+			}
+			1;
+		}||die($@) for qw(can isa DOES VERSION);
+		eval q{
+			package __REAPED__;
+			sub AUTOLOAD {
+				(my $method = $__REAPED__::AUTOLOAD) =~ s/.*:://;
+				Object::Util::croak("Can't call method \"$method\" on reaped object");
+			}
+			sub DESTROY { 1; }
+			1;
+		}||die($@);
+	};
+	
+	my $destroy = $_[0]->Object::Util::_can('DESTROY');
+	$_[0]->$destroy if $destroy;
+
+	my $reftype = reftype($_[0]);
+	if ($reftype eq 'HASH') {
+		%{$_[0]} = ();
+	}
+	elsif ($reftype eq 'ARRAY') {
+		@{$_[0]} = ();
+	}
+	elsif ($reftype eq 'SCALAR' or $reftype eq 'REF') {
+		undef ${$_[0]};
+	}
+	
+	bless $_[0], '__REAPED__';
+	undef $_[0];
+}
+
 sub subs :method
 {
 	'$_new'             => \&_new,
@@ -392,6 +433,7 @@ sub subs :method
 	'$_dwarn'           => \&_dwarn,
 	'$_dwarn_call'      => \&_dwarn_call,
 	'$_extend'          => \&_extend,
+	'$_murder'          => \&_murder,
 }
 
 sub sub_names :method
@@ -586,6 +628,29 @@ This method always returns C<< $object >>, which makes it suitable for
 chaining.
 
 Like L<Object::Extend>, but with added support for roles.
+
+=item C<< $_murder >>
+
+Called on an object, tries its best to destroy the object.
+
+  my $object = Foo->new;
+  $object->$_murder;
+  defined($object);   # false
+
+Not only will C<< $object >> be set to undef in the above example, but
+if there were any other references to the object, C<< $_murder >> will
+do its best to poison them too.
+
+C<< $_murder >> will empty out the contents of the underlying hash
+or array in hashref-based and arrayref-based objects, and for
+scalarref-based objects will set the underlying scalar to undef.
+
+C<< $_murder >> will also rebless the reference into a dummy class where
+all method calls will croak.
+
+C<< $_murder >> will generously ensure that the object's C<DESTROY> is
+called before initiating the killing spree, allowing the class to perform
+any necessary clean-up first.
 
 =back
 
