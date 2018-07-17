@@ -53,3 +53,10 @@
 	changeset [
 		item "Fix typo which referred to $_call_if_object as $_call_if_method."^^Documentation;
 	].
+
+`Object-Util 0.009 cpan:TOBYINK`
+	label   "Murder Most Horrid";
+	issued  2018-07-17;
+	changeset [
+		item "Add $_murder for destroying objects violently."^^Addition;
+	].

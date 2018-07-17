@@ -7,7 +7,7 @@ BEGIN { if ($] < 5.010000) { require UNIVERSAL::DOES } };
 package Object::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 use Carp                         qw( carp croak );
 use List::Util       1.29        qw( pairkeys pairvalues );
