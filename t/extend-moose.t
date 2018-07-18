@@ -24,6 +24,7 @@ use warnings;
 use Test::More;
 use Test::Warnings;
 use Test::Requires { Moose => '2.0000' };
+use Test::Requires { 'Moo::Role' => 1.006000 };
 
 use Object::Util;
 
