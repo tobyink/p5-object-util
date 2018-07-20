@@ -60,3 +60,9 @@
 	changeset [
 		item "Add $_murder for destroying objects violently."^^Addition;
 	].
+
+`Object-Util 0.010 cpan:TOBYINK`
+	issued  2018-07-20;
+	changeset [
+		item "t/extend-moose.t requires Moo::Role."^^Bugfix;
+	].
